@@ -30,15 +30,22 @@ jobs:
       - name: Build jars
         run: ./gradlew build
 
-      # TODO: this uploads the dev-shadow jar
       - name: Upload fabric jar
         uses: actions/upload-artifact@v3
         with:
-          name: Phobot
+          name: phobot-fabric-jar
           path: ./fabric/build/libs/phobot-fabric*.jar
 
       - name: Upload forge jar
         uses: actions/upload-artifact@v3
         with:
-          name: Phobot
+          name: phobot-forge-jar
           path: ./forge/build/libs/phobot-forge*.jar
+
+      - name: List uploaded artifacts
+        run: |
+          echo "Uploaded artifacts:"
+          echo "Fabric JAR:"
+          ls -l ./fabric/build/libs/phobot-fabric*.jar
+          echo "Forge JAR:"
+          ls -l ./forge/build/libs/phobot-forge*.jar
