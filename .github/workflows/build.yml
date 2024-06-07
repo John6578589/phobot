@@ -4,6 +4,7 @@ on:
   push:
   workflow_dispatch:
   pull_request:
+    types: [opened, reopened]
 
 jobs:
   build:
@@ -20,32 +21,62 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # TODO: build sources and javadocJar like in PB
-      #- name: Build sources jar
-      #  run: ./gradlew sourcesJar
+      - name: Build sources jar
+        run: ./gradlew sourcesJar
 
-      #- name: Build javadoc jar
-      #  run: ./gradlew javadocJar
+      - name: Build javadoc jar
+        run: ./gradlew javadocJar
 
       - name: Build jars
         run: ./gradlew build
 
-      - name: Upload fabric jar
+      - name: Upload sources jar
         uses: actions/upload-artifact@v3
         with:
-          name: phobot-fabric-jar
-          path: ./fabric/build/libs/phobot-fabric*.jar
+          name: sources-jar
+          path: ./build/libs/*-sources.jar
 
-      - name: Upload forge jar
+      - name: Upload javadoc jar
         uses: actions/upload-artifact@v3
         with:
-          name: phobot-forge-jar
-          path: ./forge/build/libs/phobot-forge*.jar
+          name: javadoc-jar
+          path: ./build/libs/*-javadoc.jar
+
+      - name: Upload main jars
+        uses: actions/upload-artifact@v3
+        with:
+          name: main-jars
+          path: |
+            ./fabric/build/libs/*.jar
+            ./forge/build/libs/*.jar
 
       - name: List uploaded artifacts
         run: |
           echo "Uploaded artifacts:"
-          echo "Fabric JAR:"
-          ls -l ./fabric/build/libs/phobot-fabric*.jar
-          echo "Forge JAR:"
-          ls -l ./forge/build/libs/phobot-forge*.jar
+          if ls ./build/libs/*-sources.jar 1> /dev/null 2>&1; then
+            echo "Sources JAR:"
+            ls -l ./build/libs/*-sources.jar
+          else
+            echo "No sources JAR found."
+          fi
+          
+          if ls ./build/libs/*-javadoc.jar 1> /dev/null 2>&1; then
+            echo "Javadoc JAR:"
+            ls -l ./build/libs/*-javadoc.jar
+          else
+            echo "No Javadoc JAR found."
+          fi
+
+          if ls ./fabric/build/libs/*.jar 1> /dev/null 2>&1; then
+            echo "Fabric JAR:"
+            ls -l ./fabric/build/libs/*.jar
+          else
+            echo "No Fabric JAR found."
+          fi
+
+          if ls ./forge/build/libs/*.jar 1> /dev/null 2>&1; then
+            echo "Forge JAR:"
+            ls -l ./forge/build/libs/*.jar
+          else
+            echo "No Forge JAR found."
+          fi
